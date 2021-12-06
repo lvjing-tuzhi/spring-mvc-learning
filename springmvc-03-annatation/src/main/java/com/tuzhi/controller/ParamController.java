@@ -26,4 +26,5 @@ public class ParamController {
         model.addAttribute("msg","结果是："+result);
         return "hello";
     }
+
 }

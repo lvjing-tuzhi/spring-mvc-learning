@@ -52,6 +52,18 @@
         <servlet-name>SpringMVC</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
+   <filter>
+       <filter-name>encoding</filter-name>
+       <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+       <init-param>
+           <param-name>encoding</param-name>
+           <param-value>utf-8</param-value>
+       </init-param>
+   </filter>
+   <filter-mapping>
+       <filter-name>encoding</filter-name>
+       <url-pattern>/*</url-pattern>
+   </filter-mapping>
 ~~~
 
 ## 1.3、创建springmvc-servlet.xml文件
@@ -148,7 +160,7 @@ public class HelloController {
 
    ~~~java
     @RequestMapping("Param/p1")
-       public String p1(int a, int b, Model model) {
+       public String p1(@RequestParam("a") int a, @RequestParam("b") int b, Model model) {
            int result = a + b;
            model.addAttribute("msg","结果是："+result);
            return "hello";
@@ -174,7 +186,19 @@ public String p2(int a, int b, Model model) {
 }
 ~~~
 
-## 2.3、RestFul风格
+## 2.3、接收对象
+
+~~~java
+ @GetMapping("update")
+    public String Update(User user) {
+        System.out.println(user);
+        return "test02";
+    }
+~~~
+
+
+
+## 2.4、RestFul风格
 
 ```java
 @GetMapping("Param/p1/{a}/{b}")
@@ -186,3 +210,129 @@ public String p1(@PathVariable int a, @PathVariable int b, Model model) {
 ```
 
 * 测试：http://127.0.0.1:8080/Param/p1/1/2
+
+# 3、路由跳转
+
+## 1、转发
+
+* 默认方式
+
+  ~~~java
+  return "hello";
+  ~~~
+
+* forward
+
+  ~~~java
+  return "forward:hello";
+  ~~~
+
+  
+
+## 2.重定向
+
+* “redirect:/具体路径”
+
+  ~~~java
+   return "redirect:/WEB-INF/jsp/test02.jsp";
+  ~~~
+
+
+# 4、设置JSON
+
+## 4.1、Jackson的使用
+
+1. 配置maven
+
+   ~~~xml
+   <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+           <dependency>
+               <groupId>com.fasterxml.jackson.core</groupId>
+               <artifactId>jackson-databind</artifactId>
+               <version>2.13.0</version>
+           </dependency>
+   ~~~
+
+   
+
+2. 解决json return 乱码问题
+
+   * 在springmvc-servlet.xml下
+
+     ~~~xml
+         <mvc:annotation-driven>
+             <mvc:message-converters register-defaults="true">
+                 <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                     <constructor-arg value="UTF-8"/>
+                 </bean>
+                 <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                     <property name="objectMapper">
+                         <bean class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean">
+                             <property name="failOnEmptyBeans" value="false"/>
+                         </bean>
+                     </property>
+                 </bean>
+             </mvc:message-converters>
+         </mvc:annotation-driven>
+     ~~~
+
+3. 创建工具类
+
+   * JsonUtil
+
+     ~~~java
+     public class JsonUtil {
+         public static String setJson(Object o) {
+             return setJson(o,"yyyy-MM-dd HH:mm:ss");
+         }
+         public static String setJson(Object o,String form) {
+             ObjectMapper mapper = new ObjectMapper();
+             mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+             mapper.setDateFormat(simpleDateFormat);
+             try {
+                 String s = mapper.writeValueAsString(o);
+                 return s;
+             } catch (JsonProcessingException e) {
+                 e.printStackTrace();
+             }
+             return null;
+         }
+     }
+     
+     ~~~
+
+4. 使用
+
+   ~~~java
+       @RequestMapping(value = "/j1")
+   //    使方法不经过视图解析器
+   //    @RequestBody
+       public String json1() {
+           User user = new User("吕竟", "男");
+           return JsonUtil.setJson(user);
+       }
+   
+       @RequestMapping("/j2")
+       public String json2() {
+           List list = new ArrayList();
+           User user = new User("吕竟", "nv");
+           User user1 = new User("吕竟", "nv");
+           User user2 = new User("吕竟", "nv");
+           list.add(user);
+           list.add(user1);
+           list.add(user2);
+           return JsonUtil.setJson(list);
+       }
+   
+       @RequestMapping("/j3")
+       public String json3() {
+           Date date = new Date();
+           return JsonUtil.setJson(date);
+       }
+   ~~~
+
+   
+
+
+
