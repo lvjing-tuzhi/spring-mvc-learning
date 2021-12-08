@@ -13,6 +13,8 @@
         <module>springmvc-02-hello</module>
         <module>springmvc-03-annatation</module>
         <module>springmvc-04-json</module>
+        <module>springmvc-05-intercepter</module>
+        <module>springmvc-06-file</module>
     </modules>
 
     <properties>
@@ -38,17 +40,21 @@
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.5</version>
+
         </dependency>
+
         <dependency>
             <groupId>javax.servlet.jsp</groupId>
             <artifactId>jsp-api</artifactId>
             <version>2.1</version>
         </dependency>
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
             <version>1.2</version>
         </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

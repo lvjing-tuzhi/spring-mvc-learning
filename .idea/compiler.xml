@@ -9,8 +9,10 @@
         <outputRelativeToContentRoot value="true" />
         <module name="springmvc-03-annatation" />
         <module name="springmvc-04-json" />
+        <module name="springmvc-05-intercepter" />
         <module name="springmvc-01-servlet" />
         <module name="springmvc-02-hello" />
+        <module name="springmvc-06-file" />
       </profile>
     </annotationProcessing>
   </component>
